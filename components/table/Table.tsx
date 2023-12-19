@@ -19,6 +19,7 @@ import { FileType } from "@/typings"
 import { Button } from "../ui/button"
 import { PencilIcon, TrashIcon } from "lucide-react"
 import { useAppStore } from "@/store/store"
+import { DeleteModal } from "../DeleteModal"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -87,6 +88,9 @@ export function DataTable<TData, TValue>({
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
               >
+
+                <DeleteModal />
+
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>
                     {cell.column.id === "timestamp" ? (
@@ -106,7 +110,10 @@ export function DataTable<TData, TValue>({
                     ) : cell.column.id === "filename" ? (
                       <p
                         onClick={() => {
-                          console.log("clicked")
+                          openRenameModal(
+                            (row.original as FileType).id,
+                            (row.original as FileType).filename
+                          )
                         }}
                         className="underline flex items-center text-blue-500 hover:cursor-pointer"
                       >
@@ -122,8 +129,8 @@ export function DataTable<TData, TValue>({
                 <TableCell key={(row.original as FileType).id}>
                   <Button
                     variant={"outline"}
-                    onClick={() => { }
-                      // openDeleteModal((row.original as FileType).id)
+                    onClick={() =>
+                      openDeleteModal((row.original as FileType).id)
                     }
                   >
                     <TrashIcon size={20} />
