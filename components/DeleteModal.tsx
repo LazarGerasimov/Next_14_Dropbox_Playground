@@ -35,16 +35,20 @@ export function DeleteModal() {
     const fileRef = ref(storage, `users/${user.id}/files/${fileId}`);
 
     try {
-      deleteObject(fileRef).then(async () => {
-        deleteDoc(doc(db, "users", user.id, "files", fileId)).then(() => {
-          console.log("file deleted");
+      deleteObject(fileRef)
+        .then(async () => {
+          deleteDoc(doc(db, "users", user.id, "files", fileId)).then(() => {
+            console.log("file deleted");
+          });
+        })
+        .finally(() => {
+          setIsDeleteModalOpen(false);
         });
-      });
+
     } catch (error) {
       console.log(error);
     }
 
-    setIsDeleteModalOpen(false);
   }
 
   return (
@@ -73,6 +77,7 @@ export function DeleteModal() {
             <span>Cancel</span>
           </Button>
           <Button
+            variant={"destructive"}
             type="submit"
             size={"sm"}
             className="px-3 flex-1"
