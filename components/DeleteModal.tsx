@@ -11,9 +11,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import { db, storage } from "@/firebase";
 import { useAppStore } from "@/store/store";
+import { useUser } from "@clerk/nextjs";
+import { deleteDoc, doc } from "firebase/firestore";
+import { deleteObject, ref } from "firebase/storage";
 
 export function DeleteModal() {
+
+  const { user } = useUser();
 
   // access to global state vars
   const [isDeleteModalOpen, setIsDeleteModalOpen, fileId, setFileId] = useAppStore((state) => [
@@ -24,7 +30,21 @@ export function DeleteModal() {
   ]);
 
   async function deleteFile() {
-    // add firebase delete functionality
+    if (!user || !fileId) return;
+
+    const fileRef = ref(storage, `users/${user.id}/files/${fileId}`);
+
+    try {
+      deleteObject(fileRef).then(async () => {
+        deleteDoc(doc(db, "users", user.id, "files", fileId)).then(() => {
+          console.log("file deleted");
+        });
+      });
+    } catch (error) {
+      console.log(error);
+    }
+
+    setIsDeleteModalOpen(false);
   }
 
   return (
